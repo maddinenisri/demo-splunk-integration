@@ -24,15 +24,13 @@ public class LogMessageSocketHandler extends TextWebSocketHandler {
     public void handleTextMessage(WebSocketSession session, TextMessage message)
             throws InterruptedException, IOException {
         log.info("Received Message: "+ message.getPayload());
-        for(WebSocketSession webSocketSession : sessions) {
-            Map value = new Gson().fromJson(message.getPayload(), Map.class);
-            webSocketSession.sendMessage(new TextMessage("Hello " + value.get("name") + " !"));
-        }
+        Map value = new Gson().fromJson(message.getPayload(), Map.class);
+        //Acknowledge single session only
+        session.sendMessage(new TextMessage("Hello " + value.get("name") + " !"));
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        //the messages will be broadcasted to all users.
         log.info("Session is established"+ session.getId());
         sessions.add(session);
     }
