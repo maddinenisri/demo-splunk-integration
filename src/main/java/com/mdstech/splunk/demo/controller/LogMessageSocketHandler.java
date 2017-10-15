@@ -3,6 +3,7 @@ package com.mdstech.splunk.demo.controller;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -19,7 +20,6 @@ public class LogMessageSocketHandler extends TextWebSocketHandler {
     //Track list of websocket seesions
     private List<WebSocketSession> sessions = new CopyOnWriteArrayList();
 
-
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message)
             throws InterruptedException, IOException {
@@ -33,6 +33,13 @@ public class LogMessageSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         //the messages will be broadcasted to all users.
+        log.info("Session is established"+ session.getId());
         sessions.add(session);
+    }
+
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        log.info("Session is closed"+ session.getId());
+        sessions.remove(session);
     }
 }
